@@ -2,16 +2,17 @@
 
 import React, { useMemo, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
+
+import { isDate } from "../../helperFunctions/helperFunction";
+import { Checkbox } from "@radix-ui/react-checkbox";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { isDate } from "./helperFunctions/helperFunction";
+  SelectContent,
+  SelectItem,
+} from "@radix-ui/react-select";
+import { Button } from "@/components/ui/button";
 
 export type Column<T> = {
   key: keyof T;

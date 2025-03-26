@@ -1,6 +1,6 @@
 "use client";
-import Dashboard from "./components/Datasource";
-import LandingPage from "./components/LandingPage";
+import Dashboard from "./components/Interface/pages/Datasource";
+import LandingPage from "./components/Interface/pages/LandingPage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 export default function Home() {

@@ -11,16 +11,17 @@ import {
   Settings,
   ChevronsUpDown,
 } from "lucide-react";
+
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
-  SheetContent,
   SheetTrigger,
+  SheetContent,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);

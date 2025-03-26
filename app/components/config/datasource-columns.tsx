@@ -1,6 +1,6 @@
 // datasource-columns.ts
 import { Badge } from "@/components/ui/badge";
-import { Column } from "../TableView";
+import { Column } from "../Interface/shared/TableView";
 import { getFileTypeBadgeStyle } from "../helperFunctions/helperFunction";
 
 export type Datasource = {
@@ -19,7 +19,7 @@ export const columns: Column<Datasource>[] = [
   {
     key: "type",
     label: "Type",
-    render: (value) => (
+    render: (value: string) => (
       <span
         className={`text-xs px-2 py-1 rounded-md font-medium ${getFileTypeBadgeStyle(
           value
