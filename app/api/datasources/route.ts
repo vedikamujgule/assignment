@@ -14,8 +14,7 @@ type Datasource = {
 const DATA_FILE = path.join(
   process.cwd(),
   "app",
-  "api",
-  "data",
+  "public",
   "datasource-data.json"
 );
 
