@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Feather, ChevronDown, CirclePlus, ArrowRight } from "lucide-react";
 import { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 
 const GradientText = ({ children }: { children: ReactNode }) => (
   <span className="bg-gradient-to-r from-[#512A51] via-[#8C417D] to-[#5E49DB] text-transparent bg-clip-text">
@@ -13,8 +12,6 @@ const GradientText = ({ children }: { children: ReactNode }) => (
 );
 
 const LandingPage = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="min-h-screen flex flex-col justify-between bg-gray-50 px-4">
       <div className="w-full max-w-4xl mx-auto flex-grow flex flex-col justify-center">
