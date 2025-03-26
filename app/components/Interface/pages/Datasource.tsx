@@ -1,41 +1,17 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo } from "react";
 import { TableView } from "../shared/TableView";
 import { MoreVertical, Search, CirclePlus, Folders } from "lucide-react";
 import { columns, Datasource } from "../../config/datasource-columns";
+import { data as staticData } from "../../config/datasource-data";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "../shared/sidebar";
 import { AddDataDialog } from "../shared/AddDataDialog";
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [data, setData] = useState<Datasource[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const tableRef = useRef<HTMLDivElement | null>(null);
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/datasources");
-      const json = await res.json();
-
-      // Convert createdAt string to Date
-      const formatted: Datasource[] = json.map((entry: any) => ({
-        ...entry,
-        createdAt: new Date(entry.createdAt),
-      }));
-
-      setData(formatted);
-    } catch (error) {
-      console.error("GET fetch failed", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const [data, setData] = useState<Datasource[]>(staticData);
 
   const filteredData = useMemo(() => {
     if (!searchQuery.trim()) return data;
@@ -56,24 +32,8 @@ const Dashboard = () => {
     );
   }, [searchQuery, data]);
 
-  const handleAddData = async (newData: Datasource) => {
-    const optimistic = [...data, newData];
-    setData(optimistic);
-
-    try {
-      await fetch("/api/datasources", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newData),
-      });
-
-      // Re-sync from server
-      await fetchData();
-    } catch (err) {
-      console.error("Failed to save new data:", err);
-      // fallback to previous state if needed
-      await fetchData();
-    }
+  const handleAddData = (newData: Datasource) => {
+    setData((prev) => [...prev, newData]);
   };
 
   return (
@@ -117,6 +77,7 @@ const Dashboard = () => {
                 </button>
               )}
             </div>
+
             <Button
               variant="outline"
               className="flex items-center gap-2 text-md"
@@ -145,16 +106,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Table or Loading */}
-        <div
-          ref={tableRef}
-          className="rounded-lg border bg-white overflow-auto"
-        >
-          {isLoading ? (
-            <div className="p-6 text-center text-blue-600 font-medium text-sm">
-              Loading...
-            </div>
-          ) : filteredData.length > 0 ? (
+        {/* Table or Empty Message */}
+        <div className="rounded-lg border bg-white overflow-auto">
+          {filteredData.length > 0 ? (
             <TableView<Datasource>
               data={filteredData}
               columns={columns}
