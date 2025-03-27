@@ -21,13 +21,24 @@ import { format } from "date-fns";
 import { CalendarIcon, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Datasource } from "app/components/config/datasource-columns";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Status } from "app/components/enums/Status";
+import { FileType } from "app/components/enums/FileType";
 
 type Props = {
   onAdd: (data: Datasource) => void;
 };
 
-export const AddDataDialog = ({}: Props) => {
+export const AddDataDialog = ({ onAdd }: Props) => {
   const [open, setOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   const [form, setForm] = useState<
     Omit<Datasource, "createdAt"> & { createdAt: Date | null }
   >({
@@ -38,37 +49,35 @@ export const AddDataDialog = ({}: Props) => {
     createdAt: null,
   });
 
+  const isTextOnly = (val: string) => isNaN(Number(val.trim()));
   const isValid =
     form.name.trim() &&
-    form.type.trim() &&
-    form.status.trim() &&
+    form.type &&
+    form.status &&
     form.createdBy.trim() &&
-    form.createdAt !== null;
+    form.createdAt !== null &&
+    isTextOnly(form.name) &&
+    isTextOnly(form.createdBy);
 
   const handleSubmit = async () => {
-    if (isValid && form.createdAt) {
-      const payload = {
-        ...form,
-        createdAt: form.createdAt.toISOString(), // ✅ Convert Date to string
-      };
+    if (!isValid || !form.createdAt) return;
 
-      try {
-        const res = await fetch("/api/datasources", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload), // ✅ Only serializable data
-        });
+    const payload = {
+      ...form,
+      createdAt: form.createdAt.toISOString(),
+    };
 
-        if (!res.ok) {
-          console.error("Failed to submit data");
-        } else {
-          const result = await res.json();
-          console.log("Successfully submitted:", result);
-        }
+    try {
+      const res = await fetch("/api/datasources", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-        // Reset and close
+      if (res.ok) {
+        const result = await res.json();
+        onAdd({ ...form, createdAt: form.createdAt });
+        console.log("Submitted:", result);
         setForm({
           name: "",
           type: "",
@@ -77,9 +86,11 @@ export const AddDataDialog = ({}: Props) => {
           createdAt: null,
         });
         setOpen(false);
-      } catch (error) {
-        console.error("Error submitting:", error);
+      } else {
+        console.error("Failed to submit");
       }
+    } catch (error) {
+      console.error("Submission error:", error);
     }
   };
 
@@ -99,26 +110,72 @@ export const AddDataDialog = ({}: Props) => {
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-4 py-4">
-          {[
-            { label: "Name", key: "name" },
-            { label: "Type", key: "type" },
-            { label: "Status", key: "status" },
-            { label: "Created By", key: "createdBy" },
-          ].map(({ label, key }) => (
-            <div key={key} className="space-y-1">
-              <Label htmlFor={key}>{label}</Label>
-              <Input
-                id={key}
-                value={form[key as keyof typeof form] as string}
-                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                placeholder={`Enter ${label.toLowerCase()}`}
-              />
-            </div>
-          ))}
+          {/* Name Field */}
+          <div className="space-y-1">
+            <Label htmlFor="name">Datasource</Label>
+            <Input
+              id="name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Enter datasource name"
+            />
+          </div>
 
+          {/* Created By Field */}
+          <div className="space-y-1">
+            <Label htmlFor="createdBy">Created By</Label>
+            <Input
+              id="createdBy"
+              value={form.createdBy}
+              onChange={(e) => setForm({ ...form, createdBy: e.target.value })}
+              placeholder="Enter creator's name"
+            />
+          </div>
+
+          {/* File Type Dropdown */}
+          <div className="space-y-1">
+            <Label htmlFor="type">Type</Label>
+            <Select
+              value={form.type}
+              onValueChange={(value) => setForm({ ...form, type: value })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select file type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(FileType).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Status Dropdown */}
+          <div className="space-y-1">
+            <Label htmlFor="status">Status</Label>
+            <Select
+              value={form.status}
+              onValueChange={(value) => setForm({ ...form, status: value })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(Status).map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {status}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Date Picker */}
           <div className="col-span-2 space-y-1">
             <Label htmlFor="createdAt">Created At</Label>
-            <Popover>
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -137,9 +194,10 @@ export const AddDataDialog = ({}: Props) => {
                 <Calendar
                   mode="single"
                   selected={form.createdAt ?? undefined}
-                  onSelect={(date) =>
-                    setForm({ ...form, createdAt: date ?? null })
-                  }
+                  onSelect={(date) => {
+                    setForm({ ...form, createdAt: date ?? null });
+                    setCalendarOpen(false); // ✅ Close after select
+                  }}
                   initialFocus
                 />
               </PopoverContent>
@@ -147,7 +205,7 @@ export const AddDataDialog = ({}: Props) => {
           </div>
         </div>
 
-        {/* Buttons */}
+        {/* Footer Buttons */}
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel

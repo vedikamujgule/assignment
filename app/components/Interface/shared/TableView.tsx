@@ -4,15 +4,16 @@ import React, { useMemo, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 
 import { isDate } from "../../helperFunctions/helperFunction";
-import { Checkbox } from "@radix-ui/react-checkbox";
+
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
-} from "@radix-ui/react-select";
-import { Button } from "@/components/ui/button";
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type Column<T> = {
   key: keyof T;
@@ -108,7 +109,7 @@ export function TableView<T extends Record<string, unknown>>({
   return (
     <div className="space-y-4">
       <div className="overflow-auto rounded-sm bg-white">
-        <table className="w-full text-sm text-left border-collapse">
+        <table className="w-full text-md text-left border-collapse">
           <thead className="bg-gray-50">
             <tr>
               <th className="pl-3 pr-1 py-1 w-4">
@@ -121,7 +122,7 @@ export function TableView<T extends Record<string, unknown>>({
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
-                  className="p-1 font-medium text-gray-600 hover:text-black cursor-pointer"
+                  className="p-1 text-md text-gray-600 hover:text-black cursor-pointer"
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
                   <div className="flex items-center gap-1">
@@ -151,7 +152,7 @@ export function TableView<T extends Record<string, unknown>>({
                   {columns.map((col) => (
                     <td
                       key={String(col.key)}
-                      className={`py-2 text-base ${
+                      className={`py-2 text-base text-md ${
                         col.key === "name" ? "pl-1 pr-2" : "p-2"
                       }`}
                     >
@@ -168,7 +169,7 @@ export function TableView<T extends Record<string, unknown>>({
       </div>
 
       {/* Pagination */}
-      <div className="flex p-2 flex-col sm:flex-row justify-between items-center gap-3 text-sm">
+      <div className="flex text-md p-2 flex-col sm:flex-row justify-between items-center gap-3 ">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
           <Select
@@ -178,7 +179,7 @@ export function TableView<T extends Record<string, unknown>>({
               setPage(0);
             }}
           >
-            <SelectTrigger className="w-20 h-8 text-sm">
+            <SelectTrigger className="w-20 h-8 text-md">
               <SelectValue placeholder="Rows" />
             </SelectTrigger>
             <SelectContent>

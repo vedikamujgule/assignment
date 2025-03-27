@@ -9,169 +9,175 @@ import {
   Database,
   Workflow,
   Settings,
-  ChevronsUpDown,
 } from "lucide-react";
-
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import * as Tooltip from "@radix-ui/react-tooltip";
+
+const navItems = [
+  { icon: Layers, label: "Models", highlight: true },
+  { icon: Database, label: "Datasources" },
+  { icon: Workflow, label: "Workflows", comingSoon: true },
+  { icon: Settings, label: "Settings" },
+];
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
 
-  const NavContent = (
-    <>
-      <div className="p-4 flex justify-center">
-        <Button
-          variant="outline"
-          className={`text-sm gap-2 ${
-            isOpen ? "w-full justify-center" : "p-2"
-          }`}
-        >
-          <Plus className="w-4 h-4" />
-          {isOpen && "Build a Model"}
-        </Button>
-      </div>
+  const renderLogo = () => (
+    <div className="flex flex-col items-start px-4 pt-4">
+      <img
+        src="https://cdn.prod.website-files.com/678a7f2dda7bdd45b1e4d835/678a823b1dac4db544e05b75_logo.svg"
+        alt="Zams Logo"
+        className="h-4"
+      />
+      <span className="mt-1 text-sm font-semibold text-gray-600">
+        Platform UI
+      </span>
+    </div>
+  );
 
-      <nav
-        className={`flex flex-col w-[240px] h-8 gap-2 p-2 rounded-md text-sm text-gray-700 ${
-          !isOpen ? "items-center" : ""
-        }`}
-      >
-        <div
-          className={`
-    w-[240px] h-8 px-2 flex justify-between items-center 
-    opacity-70 text-xs text-muted-foreground rounded-md
-    ${!isOpen && "hidden"}
-  `}
-        >
-          Pages
+  const NavContent = (collapsed: boolean) => (
+    <Tooltip.Provider delayDuration={100}>
+      <>
+        {/* CTA Button */}
+        <div className="p-4 flex justify-center">
+          <Button
+            variant="outline"
+            className={`gap-2 text-md ${
+              collapsed ? "p-2 w-10 justify-center" : "w-full justify-center"
+            }`}
+          >
+            <Plus className="w-4 h-4" />
+            {!collapsed && "Build a Model"}
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          className={`justify-start gap-2 bg-sidebar-accent text-base font-semibold ${
-            !isOpen ? "p-2" : ""
+
+        {/* Navigation */}
+        <nav
+          className={`flex flex-col gap-2 p-2 text-md text-gray-700 ${
+            collapsed ? "items-center" : ""
           }`}
         >
-          <Layers className="w-4 h-4" />
-          {isOpen && "Models"}
-        </Button>
-
-        <Button
-          variant="ghost"
-          className={`justify-start gap-2 ${!isOpen ? "p-2" : ""}`}
-        >
-          <Database className="w-4 h-4" /> {isOpen && "Datasources"}
-        </Button>
-        <Button
-          variant="ghost"
-          className={`justify-start gap-2 ${!isOpen ? "p-2" : ""}`}
-        >
-          <Workflow className="w-4 h-4" />
-          {isOpen && "Workflows"}
-          {isOpen && (
-            <span className="ml-2 p-2 text-xs">
-              {isOpen && (
-                <span className="bg-sidebar-accent w-[97px] h-[20px] px-[10px] py-[2px] rounded-md text-muted-foreground font-sans font-semibold text-xs leading-4 tracking-normal">
-                  Coming soon
-                </span>
-              )}
-            </span>
-          )}
-        </Button>
-        <Button
-          variant="ghost"
-          className={`justify-start gap-2 ${!isOpen ? "p-2" : ""}`}
-        >
-          <Settings className="w-4 h-4" /> {isOpen && "Settings"}
-        </Button>
-      </nav>
-
-      <div
-        className={`mt-auto p-4 flex items-center gap-3 ${
-          !isOpen ? "justify-center" : ""
-        }`}
-      >
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>JD</AvatarFallback>
-        </Avatar>
-        {isOpen && (
-          <div className="flex items-start gap-2">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1">
-                <p className="text-sm font-medium">John Doe</p>
-              </div>
-              <p className="text-xs text-base">john.doe@zams.com</p>
+          {!collapsed && (
+            <div className="px-2 text-sm text-muted-foreground opacity-70">
+              Pages
             </div>
-            <ChevronsUpDown className="ml-6 w-4 h-4 text-base mt-2" />
-          </div>
-        )}
-      </div>
-    </>
+          )}
+
+          {navItems.map(({ icon: Icon, label, highlight, comingSoon }) => (
+            <Tooltip.Root key={label}>
+              <Tooltip.Trigger asChild>
+                <Button
+                  variant="ghost"
+                  className={`gap-2 text-md w-full justify-start ${
+                    collapsed ? "p-2 w-10 justify-center" : ""
+                  } ${highlight ? "font-semibold" : ""}`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {!collapsed && (
+                    <>
+                      {label}
+                      {comingSoon && (
+                        <span className="ml-2 text-muted-foreground bg-sidebar-accent px-2 py-0.5 text-xs rounded">
+                          Coming soon
+                        </span>
+                      )}
+                    </>
+                  )}
+                </Button>
+              </Tooltip.Trigger>
+              {collapsed && (
+                <Tooltip.Portal>
+                  <Tooltip.Content
+                    side="right"
+                    sideOffset={8}
+                    className="bg-black text-white px-2 py-1 text-xs rounded shadow"
+                  >
+                    {label}
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
+          ))}
+        </nav>
+
+        {/* Footer */}
+        <div
+          className={`mt-auto p-4 flex items-center gap-3 ${
+            collapsed ? "justify-center" : ""
+          }`}
+        >
+          <Avatar>
+            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarFallback>JD</AvatarFallback>
+          </Avatar>
+          {!collapsed && (
+            <div className="flex flex-col">
+              <p className="text-md font-medium">John Doe</p>
+              <p className="text-xs text-muted-foreground">john.doe@zams.com</p>
+            </div>
+          )}
+        </div>
+      </>
+    </Tooltip.Provider>
   );
 
   return (
     <>
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden md:flex md:flex-col bg-gray-50 border-r transition-all duration-300 ${
+        className={`hidden md:flex flex-col bg-gray-50 border-r min-h-screen transition-all duration-300 ${
           isOpen ? "w-64" : "w-16"
         }`}
       >
+        {/* Header */}
+        {/* Header */}
         <div className="h-16 flex items-center justify-between p-4">
-          <div className="flex flex-col items-start">
-            <img
-              src="https://cdn.prod.website-files.com/678a7f2dda7bdd45b1e4d835/678a823b1dac4db544e05b75_logo.svg"
-              alt="Zams Logo"
-              className={`transition-all duration-200 h-3 ${
-                !isOpen ? "mx-auto" : ""
-              }`}
-            />
+          <div className="flex flex-col items-start leading-tight">
+            <div className="flex items-center gap-1">
+              <img
+                src="https://cdn.prod.website-files.com/678a7f2dda7bdd45b1e4d835/678a823b1dac4db544e05b75_logo.svg"
+                alt="Zams Logo"
+                className="h-4"
+              />
+            </div>
             {isOpen && (
-              <span className="mt-1 font-semibold text-sm text-gray-600">
+              <span className="text-xs text-gray-600 font-medium">
                 Platform UI
               </span>
             )}
           </div>
+
           <Button
             variant="ghost"
             size="icon"
-            className={`text-base ${!isOpen && "hidden"}`}
-            onClick={() => setIsOpen(false)}
+            className="text-base"
+            onClick={() => setIsOpen(!isOpen)}
           >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          {!isOpen && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-base"
-              onClick={() => setIsOpen(true)}
-            >
+            {isOpen ? (
+              <ChevronLeft className="w-4 h-4" />
+            ) : (
               <ChevronRight className="w-4 h-4" />
-            </Button>
-          )}
+            )}
+          </Button>
         </div>
-        {NavContent}
+
+        {NavContent(!isOpen)}
       </aside>
 
-      {/* Mobile Sidebar (Sheet) */}
+      {/* Mobile Sidebar */}
       <Sheet>
         <SheetTrigger className="md:hidden absolute top-4 left-4 z-50">
           <VisuallyHidden>Open Menu</VisuallyHidden>
           <Menu className="h-6 w-6" />
         </SheetTrigger>
         <SheetContent side="left" className="w-64 p-0">
-          <SheetTitle className="sr-only">Mobile Navigation Menu</SheetTitle>
-          {NavContent}
+          {renderLogo()}
+          {NavContent(false)}
         </SheetContent>
       </Sheet>
     </>

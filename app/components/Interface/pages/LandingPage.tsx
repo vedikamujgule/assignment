@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Feather, ChevronDown, CirclePlus, ArrowRight } from "lucide-react";
 import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 
 const GradientText = ({ children }: { children: ReactNode }) => (
   <span className="bg-gradient-to-r from-[#512A51] via-[#8C417D] to-[#5E49DB] text-transparent bg-clip-text">
@@ -12,6 +13,8 @@ const GradientText = ({ children }: { children: ReactNode }) => (
 );
 
 const LandingPage = () => {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen flex flex-col justify-between bg-gray-50 px-4">
       <div className="w-full max-w-4xl mx-auto flex-grow flex flex-col justify-center">
@@ -39,7 +42,7 @@ const LandingPage = () => {
               placeholder="Ask whatever you want.."
             />
 
-            <div className="flex items-center justify-between text-sm text-base px-4 py-3">
+            <div className="flex items-center justify-between text-md text-base px-4 py-3">
               <div className="flex gap-6 items-center">
                 <span className="cursor-pointer flex items-center">
                   <Feather size={16} className="mr-1" />
@@ -63,8 +66,8 @@ const LandingPage = () => {
 
           <div className="mt-6 flex justify-end">
             <Button
-              className="bg-black text-white px-4 py-2 text-sm rounded-full"
-              // onClick={() => navigate("/dashboard")}
+              className="bg-black text-white px-4 py-2 text-md rounded-full"
+              onClick={() => router.push("/dashboard")}
             >
               Go to Dashboard
             </Button>
