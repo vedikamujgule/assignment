@@ -32,24 +32,24 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
-  try {
-    const newEntry = await req.json();
-    const file = await fs.readFile(DATA_FILE, "utf-8");
-    const json: Datasource[] = JSON.parse(file);
+// export async function POST(req: Request) {
+//   try {
+//     const newEntry = await req.json();
+//     const file = await fs.readFile(DATA_FILE, "utf-8");
+//     const json: Datasource[] = JSON.parse(file);
 
-    json.push(newEntry);
-    await fs.writeFile(DATA_FILE, JSON.stringify(json, null, 2));
+//     json.push(newEntry);
+//     await fs.writeFile(DATA_FILE, JSON.stringify(json, null, 2));
 
-    return NextResponse.json(
-      { message: "Data added successfully", data: newEntry },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("POST API Error:", error);
-    return NextResponse.json(
-      { message: "Error processing request", error },
-      { status: 500 }
-    );
-  }
-}
+//     return NextResponse.json(
+//       { message: "Data added successfully", data: newEntry },
+//       { status: 200 }
+//     );
+//   } catch (error) {
+//     console.error("POST API Error:", error);
+//     return NextResponse.json(
+//       { message: "Error processing request", error },
+//       { status: 500 }
+//     );
+//   }
+// }
