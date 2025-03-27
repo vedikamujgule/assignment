@@ -20,7 +20,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { CalendarIcon, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Datasource } from "app/components/config/datasource-columns";
 import {
   Select,
   SelectTrigger,
@@ -28,7 +27,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Status } from "app/components/enums/Status";
+import { Datasource, Status } from "app/components/enums/Status";
 import { FileType } from "app/components/enums/FileType";
 
 type Props = {
@@ -42,21 +41,21 @@ export const AddDataDialog = ({ onAdd }: Props) => {
   const [form, setForm] = useState<
     Omit<Datasource, "createdAt"> & { createdAt: Date | null }
   >({
-    name: "",
+    datasource: "",
     type: "",
     status: "",
     createdBy: "",
-    createdAt: null,
+    createdAt: new Date(),
   });
 
   const isTextOnly = (val: string) => isNaN(Number(val.trim()));
   const isValid =
-    form.name.trim() &&
+    form.datasource.trim() &&
     form.type &&
     form.status &&
     form.createdBy.trim() &&
     form.createdAt !== null &&
-    isTextOnly(form.name) &&
+    isTextOnly(form.datasource) &&
     isTextOnly(form.createdBy);
 
   const handleSubmit = async () => {
@@ -79,7 +78,7 @@ export const AddDataDialog = ({ onAdd }: Props) => {
         onAdd({ ...form, createdAt: form.createdAt });
         console.log("Submitted:", result);
         setForm({
-          name: "",
+          datasource: "",
           type: "",
           status: "",
           createdBy: "",
@@ -97,7 +96,7 @@ export const AddDataDialog = ({ onAdd }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700">
+        <Button className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 text-md">
           <Plus className="h-4 w-4" />
           Add Data
         </Button>
@@ -109,23 +108,25 @@ export const AddDataDialog = ({ onAdd }: Props) => {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-4 py-4">
+        <div className="grid grid-cols-2 gap-4 py-4 text-md">
           {/* Name Field */}
           <div className="space-y-1">
             <Label htmlFor="name">Datasource</Label>
             <Input
-              id="name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              id="datasource"
+              className="space-y-1 text-md"
+              value={form.datasource}
+              onChange={(e) => setForm({ ...form, datasource: e.target.value })}
               placeholder="Enter datasource name"
             />
           </div>
 
           {/* Created By Field */}
-          <div className="space-y-1">
+          <div className="space-y-1 text-md">
             <Label htmlFor="createdBy">Created By</Label>
             <Input
               id="createdBy"
+              className="space-y-1 text-md"
               value={form.createdBy}
               onChange={(e) => setForm({ ...form, createdBy: e.target.value })}
               placeholder="Enter creator's name"
@@ -140,7 +141,10 @@ export const AddDataDialog = ({ onAdd }: Props) => {
               onValueChange={(value) => setForm({ ...form, type: value })}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select file type" />
+                <SelectValue
+                  placeholder="Select file type"
+                  className="space-y-1 text-md"
+                />
               </SelectTrigger>
               <SelectContent>
                 {Object.values(FileType).map((type) => (
@@ -196,7 +200,7 @@ export const AddDataDialog = ({ onAdd }: Props) => {
                   selected={form.createdAt ?? undefined}
                   onSelect={(date) => {
                     setForm({ ...form, createdAt: date ?? null });
-                    setCalendarOpen(false); // ✅ Close after select
+                    setCalendarOpen(false);
                   }}
                   initialFocus
                 />

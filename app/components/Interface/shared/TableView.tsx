@@ -1,10 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
-
-import { isDate } from "../../helperFunctions/helperFunction";
-
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -14,37 +11,71 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { isDate } from "app/components/helperFunctions/helperFunction";
 
-export type Column<T> = {
+type TableViewProps = {
+  searchQuery: string;
+  columns: Column<Datasource>[];
+  rowsPerPage?: number;
+  formatDate?: (dateStr: string) => string;
+};
+
+type Datasource = {
+  datasource: string;
+  type: string;
+  status: string;
+  createdBy: string;
+  createdAt: string;
+};
+
+type Column<T> = {
   key: keyof T;
   label: string;
   sortable?: boolean;
   render?: (value: T[keyof T], row: T) => React.ReactNode;
 };
 
-type TableViewProps<T> = {
-  data: T[];
-  columns: Column<T>[];
-  rowsPerPageOptions?: number[];
-  defaultRowsPerPage?: number;
-  rowsPerPage?: number;
-};
-
-export function TableView<T extends Record<string, unknown>>({
-  data,
+export function TableView({
+  searchQuery,
   columns,
-  rowsPerPageOptions = [5, 10, 15],
-  defaultRowsPerPage = 10,
-}: TableViewProps<T>) {
-  const [sortKey, setSortKey] = useState<keyof T | null>(null);
+  rowsPerPage = 10,
+  formatDate,
+}: TableViewProps) {
+  const [data, setData] = useState<Datasource[]>([]);
+  const [currentRowsPerPage, setCurrentRowsPerPage] = useState(rowsPerPage);
+  const [sortKey, setSortKey] = useState<keyof Datasource | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/datasources");
+        const json = await res.json();
+        setData(json);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setTimeout(() => setLoading(false), 300);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const filteredData = useMemo(() => {
+    return data.filter((item) =>
+      Object.values(item).some((val) =>
+        String(val).toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [searchQuery, data]);
 
   const sortedData = useMemo(() => {
-    if (!sortKey) return data;
-    return [...data].sort((a, b) => {
+    if (!sortKey) return filteredData;
+    return [...filteredData].sort((a, b) => {
       const aVal = a[sortKey];
       const bVal = b[sortKey];
 
@@ -58,44 +89,43 @@ export function TableView<T extends Record<string, unknown>>({
         ? String(aVal).localeCompare(String(bVal))
         : String(bVal).localeCompare(String(aVal));
     });
-  }, [data, sortKey, sortOrder]);
+  }, [filteredData, sortKey, sortOrder]);
 
   const paginatedData = useMemo(() => {
-    const start = page * rowsPerPage;
-    return sortedData.slice(start, start + rowsPerPage);
-  }, [sortedData, page, rowsPerPage]);
+    const start = page * currentRowsPerPage;
+    return sortedData.slice(start, start + currentRowsPerPage);
+  }, [sortedData, page, currentRowsPerPage]);
 
   const isAllSelected =
     paginatedData.length > 0 &&
-    paginatedData.every((_, idx) => selectedRows.has(idx + page * rowsPerPage));
+    paginatedData.every((_, idx) =>
+      selectedRows.has(idx + page * currentRowsPerPage)
+    );
 
   const toggleSelectAll = () => {
-    const newSelected = new Set(selectedRows);
-
-    if (isAllSelected) {
-      paginatedData.forEach((_, idx) =>
-        newSelected.delete(idx + page * rowsPerPage)
-      );
-    } else {
-      paginatedData.forEach((_, idx) =>
-        newSelected.add(idx + page * rowsPerPage)
-      );
-    }
-
-    setSelectedRows(newSelected);
+    const updated = new Set(selectedRows);
+    paginatedData.forEach((_, idx) => {
+      const globalIdx = idx + page * currentRowsPerPage;
+      if (isAllSelected) {
+        updated.delete(globalIdx);
+      } else {
+        updated.add(globalIdx);
+      }
+    });
+    setSelectedRows(updated);
   };
 
-  const toggleRow = (index: number) => {
+  const toggleRow = (idx: number) => {
     const updated = new Set(selectedRows);
-    if (updated.has(index)) {
-      updated.delete(index);
+    if (updated.has(idx)) {
+      updated.delete(idx);
     } else {
-      updated.add(index);
+      updated.add(idx);
     }
     setSelectedRows(updated);
   };
 
-  const handleSort = (key: keyof T) => {
+  const handleSort = (key: keyof Datasource) => {
     if (sortKey === key) {
       setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
@@ -104,15 +134,19 @@ export function TableView<T extends Record<string, unknown>>({
     }
   };
 
-  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredData.length / currentRowsPerPage);
 
   return (
-    <div className="space-y-4">
-      <div className="overflow-auto rounded-sm bg-white">
-        <table className="w-full text-md text-left border-collapse">
-          <thead className="bg-gray-50">
+    <div
+      className={`transition-opacity duration-300 ${
+        loading ? "opacity-50" : "opacity-100"
+      }`}
+    >
+      <div className="overflow-auto bg-white rounded border">
+        <table className="w-full text-sm text-left border-collapse">
+          <thead className="bg-gray-100 text-gray-700 font-medium">
             <tr>
-              <th className="pl-3 pr-1 py-1 w-4">
+              <th className="pl-3 pr-1 py-2 w-4">
                 <Checkbox
                   aria-label="Select All"
                   checked={isAllSelected}
@@ -122,7 +156,7 @@ export function TableView<T extends Record<string, unknown>>({
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
-                  className="p-1 text-md text-gray-600 hover:text-black cursor-pointer"
+                  className="p-2 cursor-pointer hover:text-black"
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
                   <div className="flex items-center gap-1">
@@ -137,27 +171,28 @@ export function TableView<T extends Record<string, unknown>>({
           </thead>
           <tbody>
             {paginatedData.map((row, idx) => {
-              const globalIndex = idx + page * rowsPerPage;
-              const isChecked = selectedRows.has(globalIndex);
-
+              const globalIdx = idx + page * currentRowsPerPage;
+              const isChecked = selectedRows.has(globalIdx);
               return (
-                <tr key={globalIndex} className="border-t hover:bg-gray-50">
-                  <td className="pl-3 pr-1 py-1 w-4">
+                <tr key={globalIdx} className="border-t hover:bg-gray-50">
+                  <td className="pl-3 pr-1 py-2 w-4">
                     <Checkbox
                       aria-label={`Select row ${idx}`}
                       checked={isChecked}
-                      onCheckedChange={() => toggleRow(globalIndex)}
+                      onCheckedChange={() => toggleRow(globalIdx)}
                     />
                   </td>
                   {columns.map((col) => (
                     <td
                       key={String(col.key)}
-                      className={`py-2 text-base text-md ${
-                        col.key === "name" ? "pl-1 pr-2" : "p-2"
+                      className={`py-2 text-sm ${
+                        col.key === "datasource" ? "pl-1 pr-2" : "p-2"
                       }`}
                     >
                       {col.render
                         ? col.render(row[col.key], row)
+                        : col.key === "createdAt" && formatDate
+                        ? formatDate(row[col.key] as string)
                         : (row[col.key] as React.ReactNode)}
                     </td>
                   ))}
@@ -169,51 +204,46 @@ export function TableView<T extends Record<string, unknown>>({
       </div>
 
       {/* Pagination */}
-      <div className="flex text-md p-2 flex-col sm:flex-row justify-between items-center gap-3 ">
+      <div className="flex justify-between items-center text-sm text-muted-foreground mt-2">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
           <Select
-            defaultValue={String(rowsPerPage)}
+            defaultValue={String(currentRowsPerPage)}
             onValueChange={(val) => {
-              setRowsPerPage(Number(val));
+              setCurrentRowsPerPage(Number(val));
               setPage(0);
             }}
           >
-            <SelectTrigger className="w-20 h-8 text-md">
+            <SelectTrigger className="w-20 h-8 text-sm">
               <SelectValue placeholder="Rows" />
             </SelectTrigger>
             <SelectContent>
-              {rowsPerPageOptions.map((option) => (
-                <SelectItem key={option} value={String(option)}>
-                  {option}
+              {[5, 10, 15, 20].map((opt) => (
+                <SelectItem key={opt} value={String(opt)}>
+                  {opt}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        <div className="flex items-center gap-4">
-          <span className="text-muted-foreground">
-            Page {page + 1} of {totalPages}
-          </span>
-          <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={page === 0}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-              disabled={page >= totalPages - 1}
-            >
-              Next
-            </Button>
-          </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+            disabled={page >= totalPages - 1}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </div>

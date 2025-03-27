@@ -1,55 +1,50 @@
-// app/api/datasources/route.ts
+import { supabase } from "app/lib/supabase";
 import { NextResponse } from "next/server";
-import path from "path";
-import { promises as fs } from "fs";
-
-type Datasource = {
-  name: string;
-  type: string;
-  status: string;
-  createdAt: string;
-  createdBy: string;
-};
-
-const DATA_FILE = path.join(
-  process.cwd(),
-  "app",
-  "public",
-  "datasource-data.json"
-);
 
 export async function GET() {
-  try {
-    const file = await fs.readFile(DATA_FILE, "utf-8");
-    const data: Datasource[] = JSON.parse(file);
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("GET API Error:", error);
+  const { data, error } = await supabase.from("datasources").select("*");
+
+  if (error) {
+    console.error("GET Error:", error.message);
     return NextResponse.json(
-      { message: "Error fetching data", error },
+      { message: "Error fetching data", details: error.details },
       { status: 500 }
     );
   }
+
+  return NextResponse.json(data);
 }
 
-// export async function POST(req: Request) {
-//   try {
-//     const newEntry = await req.json();
-//     const file = await fs.readFile(DATA_FILE, "utf-8");
-//     const json: Datasource[] = JSON.parse(file);
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    console.log("POST /api/datasources received body:", body);
 
-//     json.push(newEntry);
-//     await fs.writeFile(DATA_FILE, JSON.stringify(json, null, 2));
+    // Check required fields (optional, but helps)
+    const required = ["datasource", "type", "status", "createdBy", "createdAt"];
+    for (const field of required) {
+      if (!body[field]) {
+        console.error(`Missing required field: ${field}`);
+        return NextResponse.json(
+          { message: `Missing required field: ${field}` },
+          { status: 400 }
+        );
+      }
+    }
 
-//     return NextResponse.json(
-//       { message: "Data added successfully", data: newEntry },
-//       { status: 200 }
-//     );
-//   } catch (error) {
-//     console.error("POST API Error:", error);
-//     return NextResponse.json(
-//       { message: "Error processing request", error },
-//       { status: 500 }
-//     );
-//   }
-// }
+    const { data, error } = await supabase.from("datasources").insert([body]);
+
+    if (error) {
+      console.error("Supabase INSERT Error:", error.message, error.details);
+      return NextResponse.json(
+        { message: error.message, details: error.details },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ message: "Data added", data }, { status: 200 });
+  } catch (errror) {
+    console.error("Unhandled POST Error:", errror);
+    return NextResponse.json({ message: errror }, { status: 500 });
+  }
+}

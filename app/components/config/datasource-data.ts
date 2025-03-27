@@ -1,6 +1,4 @@
-import { Datasource } from "./datasource-columns";
-
-export const data: Datasource[] = [
+export const data = [
   {
     name: "website - data",
     type: "PDF",
