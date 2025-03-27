@@ -18,16 +18,6 @@ const DATA_FILE = path.join(
   "datasource-data.json"
 );
 
-function isValidDatasource(data: any): data is Datasource {
-  return (
-    typeof data.name === "string" &&
-    typeof data.type === "string" &&
-    typeof data.status === "string" &&
-    typeof data.createdAt === "string" &&
-    typeof data.createdBy === "string"
-  );
-}
-
 export async function GET() {
   try {
     const file = await fs.readFile(DATA_FILE, "utf-8");
@@ -45,14 +35,6 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const newEntry = await req.json();
-
-    if (!isValidDatasource(newEntry)) {
-      return NextResponse.json(
-        { message: "Invalid data format" },
-        { status: 400 }
-      );
-    }
-
     const file = await fs.readFile(DATA_FILE, "utf-8");
     const json: Datasource[] = JSON.parse(file);
 
