@@ -1,5 +1,3 @@
-// app/components/config/datasource-columns.ts
-
 type Column<T> = {
   key: keyof T;
   label: string;
@@ -24,7 +22,6 @@ export const columns: Column<Datasource>[] = [
   {
     key: "type",
     label: "Type",
-    sortable: true,
     render: (value: string) => {
       const colorMap: Record<string, string> = {
         PDF: "bg-red-100 text-red-600",
@@ -45,11 +42,10 @@ export const columns: Column<Datasource>[] = [
   {
     key: "status",
     label: "Status",
-    sortable: true,
     render: (value: string) => {
       const colorMap: Record<string, string> = {
         Uploaded: "bg-green-100 text-green-700",
-        Connected: "bg-green-100 text-green-700",
+        Connected: "bg-blue-100 text-blue-700",
         Failed: "bg-red-100 text-red-600",
       };
 
@@ -62,6 +58,7 @@ export const columns: Column<Datasource>[] = [
       );
     },
   },
+
   {
     key: "createdAt",
     label: "Created at",

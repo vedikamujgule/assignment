@@ -1,5 +1,3 @@
-// utils/getFileTypeBadgeStyle.ts
-
 import { FileType } from "../enums/FileType";
 import { Status } from "../enums/Status";
 

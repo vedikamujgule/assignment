@@ -142,5 +142,5 @@
 }
 
 .table-text {
-  @apply font-sans font-medium text-xs leading-5 tracking-normal align-middle text-gray-800;
+  @apply font-sans font-medium text-xs leading-5 tracking-normal align-middle text-gray-600;
 }

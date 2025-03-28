@@ -12,12 +12,13 @@ import {
   ChevronsUpDown,
 } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import Image from "next/image";
 
 const navItems = [
   { icon: Layers, label: "Models", highlight: true, selected: true },
@@ -28,9 +29,13 @@ const navItems = [
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const router = useRouter();
 
   const renderLogo = () => (
-    <div className="flex flex-col items-start px-4 pt-4">
+    <div
+      onClick={() => router.push("/")}
+      className="flex flex-rowitems-start px-4 pt-4 cursor-pointer"
+    >
       <Image
         src="/logos/logo.png"
         alt="Zams Logo"
@@ -38,17 +43,16 @@ export const Sidebar = () => {
         height={30}
         className="mb-2"
       />
-
-      <span className="mt-1 text-sm font-semibold text-gray-600">
-        Platform UI
-      </span>
+      <div className="flex flex-col items-start leading-tight pl-2">
+        <span className="text-xs font-semibold">Zams</span>
+        <span className="text-xs">Platform UI</span>
+      </div>
     </div>
   );
 
   const NavContent = (collapsed: boolean) => (
     <Tooltip.Provider delayDuration={100}>
       <>
-        {/* CTA Button */}
         <div className="p-4 flex justify-center">
           <Button
             variant="outline"
@@ -63,7 +67,6 @@ export const Sidebar = () => {
           </Button>
         </div>
 
-        {/* Navigation */}
         <nav
           className={`flex flex-col gap-2 p-2 text-md text-gray-700 ${
             collapsed ? "items-center" : ""
@@ -92,7 +95,7 @@ export const Sidebar = () => {
                       <>
                         {label}
                         {comingSoon && (
-                          <span className="ml-2 text-md bg-sidebar-accent px-2 py-0.5">
+                          <span className="ml-2 text-xs bg-sidebar-accent px-2 py-0.5 rounded text-muted-foreground">
                             Coming soon
                           </span>
                         )}
@@ -116,7 +119,6 @@ export const Sidebar = () => {
           )}
         </nav>
 
-        {/* Footer */}
         <div
           className={`mt-auto p-4 flex items-center justify-between ${
             collapsed ? "justify-center" : ""
@@ -153,25 +155,23 @@ export const Sidebar = () => {
           isOpen ? "w-64" : "w-16"
         }`}
       >
-        {/* Header */}
-        {/* Header */}
         <div className="h-16 flex items-center justify-between p-4">
-          <div className="flex flex-col items-start leading-tight">
-            <div className="flex items-center gap-2">
-              <Image
-                src="/logos/logo.png"
-                alt="Zams Logo"
-                width={35}
-                height={35}
-                className=""
-              />
-              {isOpen && (
-                <div className="flex flex-col items-start leading-tight">
-                  <span className="text-sm font-semibold">Zams</span>
-                  <span className="text-sm">Platform UI</span>
-                </div>
-              )}
-            </div>
+          <div
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            <Image
+              src="/logos/logo.png"
+              alt="Zams Logo"
+              width={32}
+              height={32}
+            />
+            {isOpen && (
+              <div className="flex flex-col items-start leading-tight">
+                <span className="text-xs font-semibold">Zams</span>
+                <span className="text-xs">Platform UI</span>
+              </div>
+            )}
           </div>
 
           <Button

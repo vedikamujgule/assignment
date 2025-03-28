@@ -78,13 +78,11 @@ export function TableView({
     return [...filteredData].sort((a, b) => {
       const aVal = a[sortKey];
       const bVal = b[sortKey];
-
       if (isDate(aVal) && isDate(bVal)) {
         return sortOrder === "asc"
           ? aVal.getTime() - bVal.getTime()
           : bVal.getTime() - aVal.getTime();
       }
-
       return sortOrder === "asc"
         ? String(aVal).localeCompare(String(bVal))
         : String(bVal).localeCompare(String(aVal));
@@ -126,12 +124,10 @@ export function TableView({
   };
 
   const handleSort = (key: keyof Datasource) => {
-    if (sortKey === key) {
-      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortOrder("asc");
-    }
+    setSortKey((prev) => (prev === key ? key : key));
+    setSortOrder((prev) =>
+      sortKey === key ? (prev === "asc" ? "desc" : "asc") : "asc"
+    );
   };
 
   const totalPages = Math.ceil(filteredData.length / currentRowsPerPage);
@@ -142,72 +138,73 @@ export function TableView({
         loading ? "opacity-50" : "opacity-100"
       }`}
     >
-      <div className="overflow-auto bg-white">
-        <table className="w-full text-left table-text">
-          <thead className="text-md">
-            <tr>
-              <th className="pl-3 pr-1 py-2 w-4">
-                <Checkbox
-                  aria-label="Select All"
-                  checked={isAllSelected}
-                  onCheckedChange={toggleSelectAll}
-                />
-              </th>
-              {columns.map((col) => (
-                <th
-                  key={String(col.key)}
-                  className="p-2 cursor-pointer hover:text-black table-text"
-                  onClick={() => col.sortable && handleSort(col.key)}
-                >
-                  <div className="flex items-center gap-1">
-                    {col.label}
-                    {col.sortable && (
-                      <ArrowUpDown className="w-3 h-3 text-muted-foreground" />
-                    )}
-                  </div>
+      <div className="bg-white overflow-x-auto rounded-md">
+        <div className="min-w-[800px]">
+          <table className="w-full text-left table-text">
+            <thead className="text-md">
+              <tr>
+                <th className="pl-3 pr-1 py-2 w-4">
+                  <Checkbox
+                    aria-label="Select All"
+                    checked={isAllSelected}
+                    onCheckedChange={toggleSelectAll}
+                  />
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((row, idx) => {
-              const globalIdx = idx + page * currentRowsPerPage;
-              const isChecked = selectedRows.has(globalIdx);
-              return (
-                <tr
-                  key={globalIdx}
-                  className="border-t hover:bg-gray-50 table-text"
-                >
-                  <td className="pl-3 pr-1 py-2 w-4">
-                    <Checkbox
-                      aria-label={`Select row ${idx}`}
-                      checked={isChecked}
-                      onCheckedChange={() => toggleRow(globalIdx)}
-                    />
-                  </td>
-                  {columns.map((col) => (
-                    <td
-                      key={String(col.key)}
-                      className={`py-2 table-text ${
-                        col.key === "datasource" ? "pl-1 pr-2" : "p-2"
-                      }`}
-                    >
-                      {col.render
-                        ? col.render(row[col.key], row)
-                        : col.key === "createdAt" && formatDate
-                        ? formatDate(row[col.key] as string)
-                        : (row[col.key] as React.ReactNode)}
+                {columns.map((col) => (
+                  <th
+                    key={String(col.key)}
+                    className="p-2 cursor-pointer hover:text-black table-text"
+                    onClick={() => col.sortable && handleSort(col.key)}
+                  >
+                    <div className="flex items-center gap-1">
+                      {col.label}
+                      {col.sortable && (
+                        <ArrowUpDown className="w-3 h-3 text-muted-foreground" />
+                      )}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((row, idx) => {
+                const globalIdx = idx + page * currentRowsPerPage;
+                const isChecked = selectedRows.has(globalIdx);
+                return (
+                  <tr
+                    key={globalIdx}
+                    className="border-t hover:bg-gray-50 table-text"
+                  >
+                    <td className="pl-3 pr-1 py-2 w-4">
+                      <Checkbox
+                        aria-label={`Select row ${idx}`}
+                        checked={isChecked}
+                        onCheckedChange={() => toggleRow(globalIdx)}
+                      />
                     </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    {columns.map((col) => (
+                      <td
+                        key={String(col.key)}
+                        className={`py-2 table-text ${
+                          col.key === "datasource" ? "pl-1 pr-2" : "p-2"
+                        }`}
+                      >
+                        {col.render
+                          ? col.render(row[col.key], row)
+                          : col.key === "createdAt" && formatDate
+                          ? formatDate(row[col.key] as string)
+                          : (row[col.key] as React.ReactNode)}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Pagination */}
-      <div className="p-2 flex table-text justify-between items-centermt-2">
+      <div className="p-2 flex justify-between items-center mt-2">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
           <Select
@@ -232,7 +229,6 @@ export function TableView({
 
         <div className="space-x-2">
           <Button
-            className="cursor-pointer table-text"
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -241,7 +237,6 @@ export function TableView({
             Previous
           </Button>
           <Button
-            className="cursor-pointer table-text"
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
