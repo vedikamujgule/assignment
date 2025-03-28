@@ -33,7 +33,7 @@ export const columns: Column<Datasource>[] = [
       };
 
       const classes =
-        colorMap[value.toUpperCase()] || "bg-gray-100 text-gray-700";
+        colorMap[value.toUpperCase()] || "bg-gray-100 text-gray-700 table-text";
 
       return (
         <span className={`text-xs font-medium rounded px-2 py-1 ${classes}`}>
@@ -53,7 +53,7 @@ export const columns: Column<Datasource>[] = [
         Failed: "bg-red-100 text-red-600",
       };
 
-      const classes = colorMap[value] || "bg-gray-100 text-gray-700";
+      const classes = colorMap[value] || "bg-gray-100 table-text";
 
       return (
         <span className={`text-xs font-medium rounded px-2 py-1 ${classes}`}>

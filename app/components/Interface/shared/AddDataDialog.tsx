@@ -96,7 +96,7 @@ export const AddDataDialog = ({ onAdd }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 text-md">
+        <Button className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 text-md cursor-pointer">
           <Plus className="h-4 w-4" />
           Add Data
         </Button>
@@ -108,13 +108,13 @@ export const AddDataDialog = ({ onAdd }: Props) => {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-4 py-4 text-md">
+        <div className="grid grid-cols-2 gap-4 py-4 table-text">
           {/* Name Field */}
           <div className="space-y-1">
             <Label htmlFor="name">Datasource</Label>
             <Input
               id="datasource"
-              className="space-y-1 text-md"
+              className="space-y-1 table-text"
               value={form.datasource}
               onChange={(e) => setForm({ ...form, datasource: e.target.value })}
               placeholder="Enter datasource name"
@@ -122,11 +122,11 @@ export const AddDataDialog = ({ onAdd }: Props) => {
           </div>
 
           {/* Created By Field */}
-          <div className="space-y-1 text-md">
+          <div className="space-y-1 table-text">
             <Label htmlFor="createdBy">Created By</Label>
             <Input
               id="createdBy"
-              className="space-y-1 text-md"
+              className="space-y-1 table-text"
               value={form.createdBy}
               onChange={(e) => setForm({ ...form, createdBy: e.target.value })}
               placeholder="Enter creator's name"
@@ -140,13 +140,13 @@ export const AddDataDialog = ({ onAdd }: Props) => {
               value={form.type}
               onValueChange={(value) => setForm({ ...form, type: value })}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full table-text">
                 <SelectValue
                   placeholder="Select file type"
-                  className="space-y-1 text-md"
+                  className="space-y-1 table-text"
                 />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="table-text">
                 {Object.values(FileType).map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
@@ -163,10 +163,10 @@ export const AddDataDialog = ({ onAdd }: Props) => {
               value={form.status}
               onValueChange={(value) => setForm({ ...form, status: value })}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full table-text">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="table-text">
                 {Object.values(Status).map((status) => (
                   <SelectItem key={status} value={status}>
                     {status}
@@ -177,7 +177,7 @@ export const AddDataDialog = ({ onAdd }: Props) => {
           </div>
 
           {/* Date Picker */}
-          <div className="col-span-2 space-y-1">
+          <div className="col-span-2 space-y-1 table-text">
             <Label htmlFor="createdAt">Created At</Label>
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
@@ -210,7 +210,7 @@ export const AddDataDialog = ({ onAdd }: Props) => {
         </div>
 
         {/* Footer Buttons */}
-        <div className="flex justify-end gap-2 mt-4">
+        <div className="flex justify-end gap-2 mt-4 table-text">
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>

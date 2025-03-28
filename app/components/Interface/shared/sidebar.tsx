@@ -9,6 +9,7 @@ import {
   Database,
   Workflow,
   Settings,
+  ChevronsUpDown,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -16,9 +17,10 @@ import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import Image from "next/image";
 
 const navItems = [
-  { icon: Layers, label: "Models", highlight: true },
+  { icon: Layers, label: "Models", highlight: true, selected: true },
   { icon: Database, label: "Datasources" },
   { icon: Workflow, label: "Workflows", comingSoon: true },
   { icon: Settings, label: "Settings" },
@@ -29,11 +31,14 @@ export const Sidebar = () => {
 
   const renderLogo = () => (
     <div className="flex flex-col items-start px-4 pt-4">
-      <img
-        src="https://cdn.prod.website-files.com/678a7f2dda7bdd45b1e4d835/678a823b1dac4db544e05b75_logo.svg"
+      <Image
+        src="/logos/logo.png"
         alt="Zams Logo"
-        className="h-4"
+        width={30}
+        height={30}
+        className="mb-2"
       />
+
       <span className="mt-1 text-sm font-semibold text-gray-600">
         Platform UI
       </span>
@@ -48,7 +53,9 @@ export const Sidebar = () => {
           <Button
             variant="outline"
             className={`gap-2 text-md ${
-              collapsed ? "p-2 w-10 justify-center" : "w-full justify-center"
+              collapsed
+                ? "p-2 w-10 justify-center cursor-pointer"
+                : "w-full justify-center cursor-pointer"
             }`}
           >
             <Plus className="w-4 h-4" />
@@ -68,58 +75,70 @@ export const Sidebar = () => {
             </div>
           )}
 
-          {navItems.map(({ icon: Icon, label, highlight, comingSoon }) => (
-            <Tooltip.Root key={label}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  variant="ghost"
-                  className={`gap-2 text-md w-full justify-start ${
-                    collapsed ? "p-2 w-10 justify-center" : ""
-                  } ${highlight ? "font-semibold" : ""}`}
-                >
-                  <Icon className="w-5 h-5" />
-                  {!collapsed && (
-                    <>
-                      {label}
-                      {comingSoon && (
-                        <span className="ml-2 text-muted-foreground bg-sidebar-accent px-2 py-0.5 text-xs rounded">
-                          Coming soon
-                        </span>
-                      )}
-                    </>
-                  )}
-                </Button>
-              </Tooltip.Trigger>
-              {collapsed && (
-                <Tooltip.Portal>
-                  <Tooltip.Content
-                    side="right"
-                    sideOffset={8}
-                    className="bg-black text-white px-2 py-1 text-xs rounded shadow"
+          {navItems.map(
+            ({ icon: Icon, label, highlight, comingSoon, selected }) => (
+              <Tooltip.Root key={label}>
+                <Tooltip.Trigger asChild>
+                  <Button
+                    variant="ghost"
+                    className={`gap-2 text-md w-full justify-start rounded-md ${
+                      collapsed ? "p-2 w-10 justify-center" : "px-3 py-2"
+                    } ${highlight ? "font-semibold" : ""} ${
+                      selected ? "bg-gray-100 text-black" : ""
+                    }`}
                   >
-                    {label}
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-          ))}
+                    <Icon className="w-5 h-5" />
+                    {!collapsed && (
+                      <>
+                        {label}
+                        {comingSoon && (
+                          <span className="ml-2 text-md bg-sidebar-accent px-2 py-0.5">
+                            Coming soon
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </Button>
+                </Tooltip.Trigger>
+                {collapsed && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content
+                      side="right"
+                      sideOffset={8}
+                      className="bg-black text-white px-2 py-1 text-xs rounded shadow"
+                    >
+                      {label}
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </Tooltip.Root>
+            )
+          )}
         </nav>
 
         {/* Footer */}
         <div
-          className={`mt-auto p-4 flex items-center gap-3 ${
+          className={`mt-auto p-4 flex items-center justify-between ${
             collapsed ? "justify-center" : ""
           }`}
         >
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>JD</AvatarFallback>
-          </Avatar>
+          <div className="flex items-center gap-3">
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>JD</AvatarFallback>
+            </Avatar>
+            {!collapsed && (
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold">John Doe</p>
+                <p className="text-xs text-muted-foreground">
+                  john.doe@zams.com
+                </p>
+              </div>
+            )}
+          </div>
+
           {!collapsed && (
-            <div className="flex flex-col">
-              <p className="text-md font-medium">John Doe</p>
-              <p className="text-xs text-muted-foreground">john.doe@zams.com</p>
-            </div>
+            <ChevronsUpDown className="w-4 h-4 text-gray-500 ml-auto" />
           )}
         </div>
       </>
@@ -138,18 +157,21 @@ export const Sidebar = () => {
         {/* Header */}
         <div className="h-16 flex items-center justify-between p-4">
           <div className="flex flex-col items-start leading-tight">
-            <div className="flex items-center gap-1">
-              <img
-                src="https://cdn.prod.website-files.com/678a7f2dda7bdd45b1e4d835/678a823b1dac4db544e05b75_logo.svg"
+            <div className="flex items-center gap-2">
+              <Image
+                src="/logos/logo.png"
                 alt="Zams Logo"
-                className="h-4"
+                width={35}
+                height={35}
+                className=""
               />
+              {isOpen && (
+                <div className="flex flex-col items-start leading-tight">
+                  <span className="text-sm font-semibold">Zams</span>
+                  <span className="text-sm">Platform UI</span>
+                </div>
+              )}
             </div>
-            {isOpen && (
-              <span className="text-xs text-gray-600 font-medium">
-                Platform UI
-              </span>
-            )}
           </div>
 
           <Button

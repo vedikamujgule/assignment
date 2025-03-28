@@ -142,9 +142,9 @@ export function TableView({
         loading ? "opacity-50" : "opacity-100"
       }`}
     >
-      <div className="overflow-auto bg-white rounded border">
-        <table className="w-full text-sm text-left border-collapse">
-          <thead className="bg-gray-100 text-gray-700 font-medium">
+      <div className="overflow-auto bg-white">
+        <table className="w-full text-left table-text">
+          <thead className="text-md">
             <tr>
               <th className="pl-3 pr-1 py-2 w-4">
                 <Checkbox
@@ -156,7 +156,7 @@ export function TableView({
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
-                  className="p-2 cursor-pointer hover:text-black"
+                  className="p-2 cursor-pointer hover:text-black table-text"
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
                   <div className="flex items-center gap-1">
@@ -174,7 +174,10 @@ export function TableView({
               const globalIdx = idx + page * currentRowsPerPage;
               const isChecked = selectedRows.has(globalIdx);
               return (
-                <tr key={globalIdx} className="border-t hover:bg-gray-50">
+                <tr
+                  key={globalIdx}
+                  className="border-t hover:bg-gray-50 table-text"
+                >
                   <td className="pl-3 pr-1 py-2 w-4">
                     <Checkbox
                       aria-label={`Select row ${idx}`}
@@ -185,7 +188,7 @@ export function TableView({
                   {columns.map((col) => (
                     <td
                       key={String(col.key)}
-                      className={`py-2 text-sm ${
+                      className={`py-2 table-text ${
                         col.key === "datasource" ? "pl-1 pr-2" : "p-2"
                       }`}
                     >
@@ -204,7 +207,7 @@ export function TableView({
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center text-sm text-muted-foreground mt-2">
+      <div className="p-2 flex table-text justify-between items-centermt-2">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
           <Select
@@ -214,7 +217,7 @@ export function TableView({
               setPage(0);
             }}
           >
-            <SelectTrigger className="w-20 h-8 text-sm">
+            <SelectTrigger className="w-20 h-8 table-text">
               <SelectValue placeholder="Rows" />
             </SelectTrigger>
             <SelectContent>
@@ -229,6 +232,7 @@ export function TableView({
 
         <div className="space-x-2">
           <Button
+            className="cursor-pointer table-text"
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -237,6 +241,7 @@ export function TableView({
             Previous
           </Button>
           <Button
+            className="cursor-pointer table-text"
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
