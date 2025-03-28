@@ -1,4 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Zams Assignment Document
+Zams UI-Assesment
+Zams UI Assesment is a modern, responsive platform UI built using Next.js 15,
+Tailwind CSS, TypeScript, and ShadCN. It includes a beautifully themed landing
+page, a functional data dashboard with a table, dynamic interactions, and support
+for scalable architecture and backed by Supabase for real-time data syncing and
+storage.
+Repo Link:
+https://github.com/vedikamujgule/assignment.git
+Vercel Deployment: https://assignment-sigma-olive.vercel.app/
+Features
+Landing Page
+Gradient-rich design with elegant typography (GD Sherpa) and a smooth user
+experience. Enabled Component routing to Dashboard
+Custom Sidebar
+Collapsible sidebar with icons and responsive across mobile and desktop
+Dynamic Data Table
+Sortable, paginated table with pagination, sorting and search functionality
+enamed
+Row selection with checkboxes
+Sticky pagination controls on mobile and desktop at bottom of the screen.
+Responsive layout for both desktop and mobile
+Automatically update the table if new data is added
+Enabled application routing between components
+Zams Assignment Document 1
+Add Data Dialog:
+Form validation
+Date picker with auto-close
+Dropdowns for type and status using enums
+Instant UI update after submission. Fully integrated with the data table
+(instant updates)
+Supabase Integration
+Backed by Supabase for real-time data syncing and storage.
+Deployed on Vercel
+Ready for development with CI/CD via Vercel.
+Technologies Used
+Next.js 15 (App Router)
+Tailwind CSS
+ShadCN UI
+Lucide Icons
+TypeScript
+Supabase
+Deployed via Vercel
+Getting Started
+git clone https://github.com/vedikamujgule/assignment
+cd assignment
+npm install
+npm run dev
+Deployment
+Zams Assignment Document 2
+This app is optimized for Vercel:
+npm run build
+npm start
+Future Enhancements
+Export table data as CSV
+Global dark mode support
+Role-based access control (RBAC)
+File upload support with file preview
+REST API to delet and edit datasource table
+Add filtering by created date (range)
+Add filter optiosn to Type and status
+Toast notifications for actions (add, delete,edit)
+Zams Assignment Document 3
 
 ## Getting Started
 
